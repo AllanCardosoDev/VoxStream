@@ -3,6 +3,7 @@ import os
 import time
 import zipfile
 import io
+import tempfile
 from pathlib import Path
 from TTS.api import TTS
 
@@ -33,7 +34,11 @@ LANGUAGES = {
 # Inicialização do modelo
 @st.cache_resource
 def load_model():
-    return TTS("tts_models/multilingual/multi-dataset/xtts_v2").to("cpu")
+    try:
+        return TTS("tts_models/multilingual/multi-dataset/xtts_v2").to("cpu")
+    except Exception as e:
+        st.error(f"Erro ao carregar modelo: {str(e)}")
+        return None
 
 # Função para obter vozes disponíveis
 def get_available_voices():
@@ -94,6 +99,10 @@ if 'generated_audios' not in st.session_state:
 
 # Carregar modelo
 model = load_model()
+
+if model is None:
+    st.error("Erro ao carregar o modelo TTS. Por favor, recarregue a página.")
+    st.stop()
 
 # Interface principal
 col1, col2 = st.columns([2, 1])
@@ -186,23 +195,32 @@ if st.button("🎙️ Gerar Áudio", type="primary", disabled=not text_input):
                 if selected_voice != "Voz Padrão":
                     speaker_wav = str(Path("voices") / f"{selected_voice}.wav")
                 
-                # Gerar áudio em memória
-                with io.BytesIO() as audio_buffer:
-                    model.tts_to_file(
-                        text=part,
-                        file_path=audio_buffer,
-                        speaker_wav=speaker_wav,
-                        language=LANGUAGES[selected_language],
-                        speed=speed
-                    )
-                    audio_bytes = audio_buffer.getvalue()
-                    
-                    # Salvar no session state
-                    st.session_state.generated_audios.append({
-                        'name': file_name,
-                        'data': audio_bytes,
-                        'text': part
-                    })
+                # Gerar áudio usando arquivo temporário
+                with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+                    temp_path = temp_file.name
+                
+                # Gerar áudio no arquivo temporário
+                model.tts_to_file(
+                    text=part,
+                    file_path=temp_path,
+                    speaker_wav=speaker_wav,
+                    language=LANGUAGES[selected_language],
+                    speed=speed
+                )
+                
+                # Ler o arquivo gerado
+                with open(temp_path, 'rb') as audio_file:
+                    audio_bytes = audio_file.read()
+                
+                # Remover arquivo temporário
+                os.unlink(temp_path)
+                
+                # Salvar no session state
+                st.session_state.generated_audios.append({
+                    'name': file_name,
+                    'data': audio_bytes,
+                    'text': part
+                })
                     
             except Exception as e:
                 st.error(f"Erro na parte {i+1}: {str(e)}")
