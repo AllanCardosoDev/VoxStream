@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "copilot/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    name: Testes e Linting
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Instalar dependências mínimas para testes
+        run: |
+          python -m pip install --upgrade pip
+          # Instala apenas as dependências que não precisam de GPU/modelos pesados
+          pip install pytest pytest-cov
+
+      - name: Executar testes unitários (módulos sem dependências pesadas)
+        run: |
+          pytest tests/test_config.py tests/test_text_processing.py tests/test_audio_utils.py -v --tb=short
+
+      - name: Verificar sintaxe Python (compilação)
+        run: python -m compileall voxstream/ app.py -q

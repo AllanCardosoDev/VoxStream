@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# Virtualenv / venv
+.venv/
+venv/
+ENV/
+env/
+
+# Distribuição / build
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+
+# pytest / testes
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.cover
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Variáveis de ambiente
+.env
+
+# Modelos TTS (grandes demais para o Git)
+~/.local/share/tts/
+/root/.local/share/tts/
+
+# Arquivos de áudio gerados (não são source code)
+output/
+*.wav
+# Exceto as vozes de referência do projeto:
+!voices/*.wav
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+tmp/
