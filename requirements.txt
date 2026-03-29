@@ -1,6 +1,6 @@
-streamlit
-TTS
-torch
-torchaudio
-torchvision
-numpy
+# VoxStream dependencies — versões fixas para reprodutibilidade
+streamlit>=1.32.0,<2.0.0
+TTS>=0.22.0,<1.0.0
+torch>=2.2.0,<3.0.0
+torchaudio>=2.2.0,<3.0.0
+numpy>=1.26.0,<2.0.0
