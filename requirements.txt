@@ -1,6 +1,4 @@
-streamlit
-TTS
-torch
-torchaudio
-torchvision
-numpy
+streamlit>=1.32.0
+torch>=2.6.0
+torchaudio>=2.6.0
+TTS>=0.22.0
